@@ -4,7 +4,12 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/releases/**",
+      "package*.json",
+      "main.js",
+      "preload.js"
     ],
     "headers": [
       {

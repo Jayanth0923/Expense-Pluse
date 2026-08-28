@@ -122,6 +122,22 @@ function ensureRows_(sheet, requiredRow) {
 
 ---
 
+### 📲 How to Use Back Tap for 1-Second Expense Entry on iPhone
+
+1. After setting up Shortcuts on your iPhone, open **Settings** → **Accessibility**.
+2. Under Accessibility, tap **Physical and Motor** → **Touch**.
+3. Scroll down to the bottom and select **Back Tap**.
+4. In Back Tap, tap **Double Tap**.
+5. Scroll to the very bottom to the **Shortcuts** section. Select the shortcut named **Expense Pulse**.
+6. Whenever you need to add an expense, simply **double-tap the back side of your iPhone**!
+7. It will instantly prompt you for the **Amount**, **Category**, and an optional **Note** for what you spent.
+8. Once submitted, a notification will confirm that your expense was added to your Google Sheet.
+9. Open the **Expense Pulse Web App / Windows App** and tap **Sync** (or refresh) to see your live expense dashboard!
+
+> ⚠️ *Make sure your Google Sheet link is correct in ⚙️ Settings and you have published it as CSV!*
+
+---
+
 ## ⚡ Quick Fixes (If it doesn’t work)
 
 * 🔴 **Google says “Authorization required”**: Re-open Apps Script, click **Deploy** → **Manage deployments**, and confirm access is set to **Anyone**.
