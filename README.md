@@ -8,8 +8,10 @@
 ## 🌐 Live Web App & Desktop Downloads
 
 * 📱 **Live iPhone / Web App**: [https://expense-pulse-for-iphone.web.app](https://expense-pulse-for-iphone.web.app)
-* 🖥️ **Windows Auto-Installer (.exe)**: [eleases/Expense Pulse Setup 1.0.0.exe](releases/Expense%20Pulse%20Setup%201.0.0.exe)
-* 📦 **Windows Portable Version (.exe)**: [eleases/Expense Pulse 1.0.0.exe](releases/Expense%20Pulse%201.0.0.exe)
+* 🖥️ **Windows Auto-Installer (.exe)**: [
+eleases/Expense Pulse Setup 1.0.0.exe](releases/Expense%20Pulse%20Setup%201.0.0.exe)
+* 📦 **Windows Portable Version (.exe)**: [
+eleases/Expense Pulse 1.0.0.exe](releases/Expense%20Pulse%201.0.0.exe)
 
 ---
 
@@ -29,7 +31,7 @@ Say the amount, pick a category, add a note—and your Google Sheet updates auto
 
 ---
 
-## 🛠️ The Complete Setup (Six Steps — One Time Only)
+## 🛠️ The Complete Setup (Six Steps — One Time Only) For more details visit web-app
 
 > Use a computer for the Google steps. Finish the Shortcut setup on your iPhone.
 
