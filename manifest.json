@@ -1,0 +1,23 @@
+{
+  "name": "Expense Pulse",
+  "short_name": "ExpensePulse",
+  "description": "Personal Neubrutalism Expense Pulse connected to Google Sheets",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F0EA",
+  "theme_color": "#FFE600",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

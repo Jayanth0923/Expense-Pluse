@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Expense Pulse</title>
+  
+  <!-- Apple iOS & Android PWA Web App Meta Tags & Touch Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ExpensePulse">
+  <meta name="theme-color" content="#FFE600">
+
+  <!-- RemixIcon CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Core App Stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- HEADER NAVIGATION BAR (MATCHING HAND-DRAWN SKETCH WIREFRAME) -->
+    <header class="header-nav neo-box-thick" id="mainHeader">
+      <!-- ROW 1: BRAND TITLE & HAMBURGER MENU BUTTON -->
+      <div class="brand-title-row">
+        <div class="brand-title">
+          <div class="brand-icon">
+            <i class="ri-flashlight-fill"></i>
+          </div>
+          <div class="brand-text">
+            <h1>EXPENSE PULSE</h1>
+            <p>Live iPhone Google Sheets Tracker</p>
+          </div>
+        </div>
+
+        <button class="neo-btn menu-toggle-btn" id="menuToggleBtn" title="Menu">
+          <i class="ri-menu-3-line"></i>
+        </button>
+      </div>
+
+      <!-- ROW 2: SYNC STATUS PILL (LEFT) & SYNC BUTTON (RIGHT) -->
+      <div class="header-row">
+        <div class="sync-status-pill" id="syncStatusPill">
+          <div class="status-dot live" id="statusDot"></div>
+          <span id="syncStatusText">Synced</span>
+        </div>
+
+        <button class="neo-btn neo-btn-cyan" id="syncBtn" title="Sync Live Data">
+          <i class="ri-refresh-line" id="syncIcon"></i>
+          <span>Sync</span>
+        </button>
+      </div>
+
+      <!-- ROW 3: SETUP GUIDE BUTTON (LEFT) & SETTINGS BUTTON (RIGHT) -->
+      <div class="header-row">
+        <button class="neo-btn neo-btn-pink setup-guide-btn" id="shortcutGuideBtn" title="iPhone & Google Sheet Setup Guide">
+          <i class="ri-smartphone-line"></i>
+          <span>Setup Guide</span>
+        </button>
+
+        <button class="neo-btn neo-btn-purple settings-btn" id="settingsBtn" title="Settings">
+          <i class="ri-settings-4-line"></i>
+          <span>Settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE 1: HOME / DASHBOARD VIEW -->
+    <div id="viewHome" class="view-page active">
+      <!-- METRICS DASHBOARD GRID -->
+      <section class="metrics-grid">
+        <!-- Total Spent Card -->
+        <div class="stat-card total-spent neo-box" id="cardTotalSpent">
+          <div class="stat-header">
+            <span class="stat-label">Total Expenses</span>
+            <div class="stat-icon"><i class="ri-wallet-3-line"></i></div>
+          </div>
+          <div class="stat-value" id="statTotalSpent">₹0</div>
+          <div class="stat-footer">
+            <span class="neo-badge" id="statTxCount">0 Transactions</span>
+          </div>
+        </div>
+
+        <!-- Today's Spent Card -->
+        <div class="stat-card today-spent neo-box" id="cardTodaySpent">
+          <div class="stat-header">
+            <span class="stat-label">Today's Spend</span>
+            <div class="stat-icon"><i class="ri-calendar-check-line"></i></div>
+          </div>
+          <div class="stat-value" id="statTodaySpent">₹0</div>
+          <div class="stat-footer">
+            <i class="ri-time-line"></i> <span id="statTodayDate">Today</span>
+          </div>
+        </div>
+
+        <!-- Top Category Card -->
+        <div class="stat-card top-category neo-box" id="cardTopCategory">
+          <div class="stat-header">
+            <span class="stat-label">Top Category</span>
+            <div class="stat-icon"><i class="ri-pie-chart-2-line"></i></div>
+          </div>
+          <div class="stat-value" id="statTopCategory">--</div>
+          <div class="stat-footer">
+            <span id="statTopCategoryAmount">₹0 spent</span>
+          </div>
+        </div>
+
+        <!-- Average Spent Card -->
+        <div class="stat-card avg-spent neo-box" id="cardAvgSpent">
+          <div class="stat-header">
+            <span class="stat-label">Avg / Expense</span>
+            <div class="stat-icon"><i class="ri-calculator-line"></i></div>
+          </div>
+          <div class="stat-value" id="statAvgSpent">₹0</div>
+          <div class="stat-footer">
+            <i class="ri-bar-chart-fill"></i> <span>Per transaction</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS CHARTS SECTION -->
+      <section class="analytics-section">
+        <!-- Category Doughnut Chart -->
+        <div class="chart-card neo-box" id="chartCardCategory">
+          <div class="chart-card-header">
+            <h3><i class="ri-donut-chart-fill"></i> Spending by Category</h3>
+            <span class="neo-badge">Breakdown</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Daily Spending Timeline Bar Chart -->
+        <div class="chart-card neo-box" id="chartCardTimeline">
+          <div class="chart-card-header">
+            <h3><i class="ri-line-chart-fill"></i> Daily Spend Trend</h3>
+            <span class="neo-badge">Timeline</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="timelineChart"></canvas>
+          </div>
+        </div>
+      </section>
+    </div> <!-- /viewHome -->
+
+    <!-- PAGE 2: EXPENSE CARDS VIEW -->
+    <div id="viewCards" class="view-page">
+      <!-- CONTROLS & SEARCH BAR -->
+      <section class="feed-header-controls neo-box">
+        <div class="search-filter-row">
+          <!-- Search Input -->
+          <div class="search-input-wrapper">
+            <i class="ri-search-line"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search note, amount, category..." />
+          </div>
+
+          <!-- Sort Select -->
+          <select id="sortSelect" class="sort-select">
+            <option value="newest">📅 Newest First</option>
+            <option value="oldest">⏳ Oldest First</option>
+            <option value="highest">💰 Highest Amount</option>
+            <option value="lowest">📉 Lowest Amount</option>
+          </select>
+        </div>
+
+        <!-- Category Filter Chips -->
+        <div class="category-chips" id="categoryChips">
+          <div class="category-chip active" data-category="ALL">
+            <span>✨ All</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS FEED LIST -->
+      <main class="transactions-list" id="transactionsList">
+        <!-- Transaction cards dynamically injected here -->
+      </main>
+
+      <!-- EMPTY STATE TEMPLATE -->
+      <div id="emptyState" class="empty-state neo-box" style="display: none;">
+        <div class="empty-icon">💸</div>
+        <h4>No Expenses Found</h4>
+        <p>No transactions match your search or filter criteria.</p>
+      </div>
+    </div> <!-- /viewCards -->
+
+    <!-- APP FOOTER BRANDING -->
+    <footer class="app-footer">
+      <p>Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong></p>
+    </footer>
+
+  </div> <!-- /app-container -->
+
+  <!-- APPLE-STYLE LIQUID GLASS BOTTOM NAVIGATION TASKBAR -->
+  <div class="bottom-dock-wrapper">
+    <nav class="bottom-dock lg-element" id="bottomDock">
+      <button class="dock-tab active" data-target="viewHome" id="tabHome">
+        <i class="ri-home-5-fill"></i>
+        <span>Home</span>
+      </button>
+      <button class="dock-tab" data-target="viewCards" id="tabCards">
+        <i class="ri-bank-card-fill"></i>
+        <span>Cards</span>
+        <span class="dock-badge" id="dockTxBadge">0</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="ri-settings-4-line"></i> Sheet Connection Settings</h3>
+        <button class="close-btn" id="closeSettingsBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label for="sheetUrlInput">Published Google Sheet CSV URL</label>
+          <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/.../pub?output=csv" />
+          <small style="display:block; margin-top:4px; font-weight:600; opacity:0.8;">Must be published to web as Comma-separated values (.csv)</small>
+        </div>
+
+        <div class="input-group">
+          <label for="autoRefreshInterval">Auto-Refresh Interval (Seconds)</label>
+          <input type="number" id="autoRefreshInterval" min="5" max="3600" value="1800" />
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+          <button class="neo-btn neo-btn-green" id="saveSettingsBtn" style="width:100%; justify-content:center; text-align:center; display:flex; align-items:center; gap:6px;"><i class="ri-check-double-line"></i> Save & Sync</button>
+          <div style="display: flex; gap: 10px;">
+            <button class="neo-btn neo-btn-pink" id="restoreDeletedBtn" style="flex:1;"><i class="ri-history-line"></i> Restore Deleted Cards</button>
+            <button class="neo-btn neo-btn-white" id="resetDefaultBtn">Reset Default</button>
+          </div>
+        </div>
+
+        <div class="modal-footer-brand">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IPHONE SHORTCUT & SHEET SETUP GUIDE MODAL -->
+  <div class="modal-overlay" id="shortcutModal">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3><i class="ri-smartphone-line"></i> iPhone Shortcut & Sheet Setup Guide</h3>
+        <button class="close-btn" id="closeShortcutBtn">&times;</button>
+      </div>
+      <div class="modal-body setup-guide-body">
+        
+        <!-- HERO BANNER -->
+        <div class="guide-hero neo-box neo-box-yellow">
+          <h4>Track every expense. In seconds. ⚡</h4>
+          <p>Say the amount, pick a category, add a note—and your Google Sheet updates automatically. No paid app. Your data stays in your own personal Google account.</p>
+          <div class="guide-hero-actions">
+            <a href="https://www.icloud.com/shortcuts/d31b8e822e28408f97a443466d499642" target="_blank" rel="noopener" class="neo-btn neo-btn-pink">
+              <i class="ri-download-cloud-line"></i> Get the Shortcut ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- WHAT YOU'LL GET SECTION -->
+        <div class="guide-section-title">✨ What you'll get</div>
+        <div class="guide-features-grid">
+          <div class="guide-feature-card neo-box">
+            <div class="feature-num">01</div>
+            <h5>One-tap entry</h5>
+            <p>Log the amount, category, and an optional note from your iPhone in seconds.</p>
+          </div>
+          <div class="guide-feature-card neo-box" style="background-color: var(--pop-green);">
+            <div class="feature-num">02</div>
+            <h5>Automatic dashboard</h5>
+            <p>See monthly spend, category totals, trends, and recent expenses updated live.</p>
+          </div>
+          <div class="guide-feature-card neo-box" style="background-color: var(--pop-cyan);">
+            <div class="feature-num">03</div>
+            <h5>Your own data</h5>
+            <p>The Sheet and connection live inside your personal Google account. Details go from your iPhone directly to your Google Sheet.</p>
+          </div>
+        </div>
+
+        <!-- PRIVACY NOTE -->
+        <div class="privacy-callout neo-box">
+          <i class="ri-shield-check-line"></i> <strong>Your data stays yours:</strong> Every person makes their own Sheet copy and deploys their own connector. Expense details go from their iPhone directly to their Google Sheet.
+        </div>
+
+        <!-- THE COMPLETE SETUP -->
+        <div class="guide-section-title">🛠️ The Complete Setup (Six Steps — One Time Only)</div>
+        <p class="guide-note"><i class="ri-information-line"></i> Use a computer for the Google steps. Finish the Shortcut setup on your iPhone.</p>
+
+        <div class="setup-steps-list">
+
+          <!-- STEP 1 -->
+          <div class="setup-step-card neo-box">
+            <div class="step-badge">STEP 01</div>
+            <h4>Make your own Sheet</h4>
+            <p>Tap the button below, sign in to Google if asked, then choose <strong>Make a copy</strong>. The dashboard and its attached script are copied into your account.</p>
+            <a href="https://docs.google.com/spreadsheets/d/1EUD-k7AFYv-8y1fTsBElhW34hjVy_Drrw6oanD-CoRo/copy" target="_blank" rel="noopener" class="neo-btn neo-btn-green" style="margin-top: 10px; display: inline-flex;">
+              <i class="ri-file-excel-line"></i> Copy the Expense Pulse Sheet ↗
+            </a>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="setup-step-card neo-box">
+            <div class="step-badge">STEP 02</div>
+            <h4>Open the built-in script</h4>
+            <p>Inside your copied Sheet, open <strong>Extensions → Apps Script</strong>. You should see code containing a function named <code>doPost</code>.</p>
+            <p>If the code is already there, leave it exactly as it is and continue. If the editor is blank, copy the script below and paste it into <code>Code.gs</code>.</p>
+            
+            <div class="code-box-wrapper">
+              <div class="code-box-header">
+                <span>Fallback code — only if your editor is blank (Code.gs)</span>
+                <button class="copy-code-btn" id="copyScriptCodeBtn"><i class="ri-file-copy-line"></i> Copy Code</button>
+              </div>
+              <pre class="code-block" id="appScriptCode"><code>const CATEGORIES = ["🍛 Food","🛍 Shopping","🚙 Travel","🧾 Bills","🎬 Entertainment","📦 Other"];
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Expenses");
+    const data = JSON.parse(e.postData.contents);
+    const nextRow = sheet.getLastRow() + 1;
+    ensureRows_(sheet, nextRow);
+    sheet.getRange(nextRow, 1, 1, 4).setValues([[ new Date(), Number(data.amount), data.category, data.note || "" ]]);
+    sheet.getRange(nextRow, 1).setNumberFormat("dd mmm yyyy, hh:mm am/pm");
+    sheet.getRange(nextRow, 2).setNumberFormat("₹#,##0");
+    return ContentService.createTextOutput(JSON.stringify({status:"success",row:nextRow}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function ensureRows_(sheet, requiredRow) {
+  if (requiredRow > sheet.getMaxRows()) {
+    sheet.insertRowsAfter(sheet.getMaxRows(), Math.max(500, requiredRow - sheet.getMaxRows()));
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="setup-step-card neo-box">
+            <div class="step-badge">STEP 03</div>
+            <h4>Deploy your connector</h4>
+            <ol class="step-instructions">
+              <li>Click <strong>Deploy → New deployment</strong>.</li>
+              <li>Tap the gear beside "Select type" and choose <strong>Web app</strong>.</li>
+              <li>Set <strong>Execute as</strong> to <code>Me</code>.</li>
+              <li>Set <strong>Who has access</strong> to <code>Anyone</code>.</li>
+              <li>Click <strong>Deploy</strong> and approve Google’s permission request.</li>
+            </ol>
+            <p class="step-subtext">Google may show an "unverified" warning. First confirm that you are authorizing the script inside your own copied Sheet. Then choose <strong>Advanced → Continue to project → Allow</strong>.</p>
+            <p><strong>Copy the Web app URL.</strong> The correct address ends in <code>/exec</code>.</p>
+            <div class="why-callout">
+              <strong>Why "Anyone"?</strong> It lets the Shortcut send an expense without making you sign in every time. It does not let visitors open or read your Sheet.
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="setup-step-card neo-box">
+            <div class="step-badge">STEP 04</div>
+            <h4>Install and connect the Shortcut</h4>
+            <p>Open the Shortcut link on your iPhone, tap <strong>Get Shortcut</strong>, then open it for editing.</p>
+            <a href="https://www.icloud.com/shortcuts/d31b8e822e28408f97a443466d499642" target="_blank" rel="noopener" class="neo-btn neo-btn-pink" style="margin: 10px 0; display: inline-flex;">
+              <i class="ri-smartphone-line"></i> Install Expense Pulse ↗
+            </a>
+            <ol class="step-instructions">
+              <li>Scroll near the bottom to the blank URL action immediately above <em>"Get Contents of URL"</em>.</li>
+              <li>Paste your Google web-app URL ending in <code>/exec</code>.</li>
+              <li>Tap <strong>Done</strong>.</li>
+            </ol>
+            <div class="why-callout" style="background-color: var(--pop-pink); color: #FFF;">
+              <strong>Security tip:</strong> Treat that URL like a password. Anyone who gets it could add unwanted rows to your Sheet. This script does not provide a way to read your expenses, but you should still never share the URL.
+            </div>
+          </div>
+
+          <!-- STEP 5 -->
+          <div class="setup-step-card neo-box">
+            <div class="step-badge">STEP 05</div>
+            <h4>Add one test expense</h4>
+            <ol class="step-instructions">
+              <li>Run the Shortcut on your iPhone and enter a small test amount.</li>
+              <li>Pick a category and add an optional note.</li>
+              <li>Allow network access if iPhone asks.</li>
+              <li>Open the <em>Expenses</em> tab in your Sheet and check the new row.</li>
+            </ol>
+            <p><strong>See the new row? You're almost done!</strong> Continue to Step 6 below to connect your sheet to this web app.</p>
+          </div>
+
+          <!-- STEP 6 -->
+          <div class="setup-step-card neo-box">
+            <div class="step-badge">STEP 06</div>
+            <h4>Connect your Sheet to Expense Pulse Web App</h4>
+            <ol class="step-instructions">
+              <li>Inside your Google Sheet, click <strong>File → Share → Publish to web</strong>.</li>
+              <li>Under "Link", select <strong>Comma-separated values (.csv)</strong> and click <strong>Publish</strong>.</li>
+              <li>Copy the published link.</li>
+              <li>In Expense Pulse, click the <strong>⚙️ Settings</strong> icon at the top right, paste your published CSV link into the URL field, and tap <strong>Save Connection</strong>.</li>
+            </ol>
+            <p><strong>Setup Complete!</strong> Expense Pulse will now automatically sync your daily expenses!</p>
+          </div>
+
+        </div>
+
+        <!-- QUICK FIXES -->
+        <div class="quick-fixes-box neo-box">
+          <h5>⚡ Quick fixes (If it doesn’t work)</h5>
+          <ul class="fixes-list">
+            <li><strong>Google says “Authorization required”:</strong> Re-open Apps Script, click Deploy → Manage deployments, and confirm access is set to <em>Anyone</em>.</li>
+            <li><strong>The Shortcut finishes, but no row appears:</strong> Check if your Web App URL ends in <code>/exec</code> (not <code>/edit</code>).</li>
+            <li><strong>The dashboard looks empty:</strong> Ensure your Sheet is published to web as <em>Comma-separated values (.csv)</em> and saved in ⚙️ Settings.</li>
+          </ul>
+        </div>
+
+        <!-- OFFICIAL REFERENCES -->
+        <div class="guide-references neo-box">
+          <h5>Official References</h5>
+          <div class="ref-links">
+            <a href="https://developers.google.com/apps-script/guides/web" target="_blank" rel="noopener"><i class="ri-external-link-line"></i> Google: Deploy Web Apps ↗</a>
+            <a href="https://support.apple.com/guide/shortcuts/request-your-first-api-apd58d46713f/ios" target="_blank" rel="noopener"><i class="ri-external-link-line"></i> Apple: URL Requests in Shortcuts ↗</a>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+          <button class="neo-btn neo-btn-yellow" id="gotItBtn" style="padding: 12px 32px; font-size: 1rem;">Setup Complete — Let's Track! 🚀</button>
+        </div>
+
+        <div class="modal-footer-brand">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT-SIDE MENU DRAWER -->
+  <div class="drawer-overlay" id="appMenuDrawer">
+    <div class="drawer-panel">
+      <div class="drawer-header">
+        <h3><i class="ri-menu-3-line"></i> Menu</h3>
+        <button class="close-btn" id="closeMenuBtn">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <div class="menu-list-group">
+          <button class="menu-item-btn neo-box" id="menuMonthlySummaryBtn">
+            <div class="menu-item-left"><i class="ri-calendar-event-fill"></i> <span>Monthly Summary</span></div>
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+
+          <button class="menu-item-btn neo-box" id="menuCheckUpdatesBtn">
+            <div class="menu-item-left"><i class="ri-refresh-line"></i> <span>Check for Updates</span></div>
+            <span style="font-size: 0.7rem; font-weight: 800; background: #000; color: #FFF; padding: 2px 6px; border-radius: 6px;">v1.0.0</span>
+          </button>
+
+          <button class="menu-item-btn neo-box" id="menuHelpBtn">
+            <div class="menu-item-left"><i class="ri-question-line"></i> <span>Help & Support</span></div>
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+
+          <button class="menu-item-btn neo-box" id="menuContactBtn">
+            <div class="menu-item-left"><i class="ri-mail-line"></i> <span>Contact Studio</span></div>
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+
+          <button class="menu-item-btn neo-box" id="menuPrivacyBtn">
+            <div class="menu-item-left"><i class="ri-shield-user-line"></i> <span>Privacy Policy</span></div>
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+
+          <button class="menu-item-btn neo-box" id="menuTermsBtn">
+            <div class="menu-item-left"><i class="ri-file-text-line"></i> <span>Terms & Conditions</span></div>
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+
+        <div class="modal-footer-brand">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT STUDIO MODAL -->
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal-content modal-sm">
+      <div class="modal-header">
+        <h3><i class="ri-mail-line"></i> Contact FerryPot Studios</h3>
+        <button class="close-btn" id="closeContactBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="neo-box neo-box-yellow" style="padding: 16px; margin-bottom: 14px;">
+          <h4 style="font-family: var(--font-heading); font-weight:800; font-size:1.1rem; margin-bottom:6px;">Have a question or feedback? ✉️</h4>
+          <p style="font-size:0.9rem; font-weight:600; line-height:1.4;">We'd love to hear from you! Send us an email anytime and our studio team will get back to you shortly.</p>
+        </div>
+        <a href="mailto:ferrypotstudios@gmail.com" class="neo-btn neo-btn-pink" style="width: 100%; justify-content: center; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; padding: 12px;">
+          <i class="ri-mail-send-line"></i> Email FerryPot Studios ↗
+        </a>
+        <div class="modal-footer-brand">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACY POLICY MODAL -->
+  <div class="modal-overlay" id="privacyModal">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3><i class="ri-shield-user-line"></i> Privacy Policy</h3>
+        <button class="close-btn" id="closePrivacyBtn">&times;</button>
+      </div>
+      <div class="modal-body legal-modal-body">
+        <div class="privacy-callout neo-box" style="background-color: var(--pop-green); color: #FFF; margin-bottom: 14px;">
+          <i class="ri-lock-line"></i> <strong>100% Private & Self-Hosted:</strong> Your financial data never passes through FerryPot Studios servers.
+        </div>
+        <h5>1. Data Ownership</h5>
+        <p>Expense Pulse operates directly between your personal iPhone/device and your personal Google Account. Your expenses are logged inside your own Google Sheet copy.</p>
+        
+        <h5>2. Local Storage</h5>
+        <p>Expense Pulse stores your published Sheet URL and preference settings locally on your device in browser LocalStorage. We do not track, collect, or share your personal information.</p>
+        
+        <h5>3. Third-Party Access</h5>
+        <p>We use no analytics scripts, advertising trackers, or external database servers. All network requests go directly to Google Apps Script endpoints authorized by you.</p>
+
+        <div class="modal-footer-brand">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMS & CONDITIONS MODAL -->
+  <div class="modal-overlay" id="termsModal">
+    <div class="modal-content modal-lg">
+      <div class="modal-header">
+        <h3><i class="ri-file-text-line"></i> Terms & Conditions</h3>
+        <button class="close-btn" id="closeTermsBtn">&times;</button>
+      </div>
+      <div class="modal-body legal-modal-body">
+        <h5>1. Acceptance of Terms</h5>
+        <p>By accessing and using Expense Pulse, you agree to these Terms & Conditions. If you do not agree, please discontinue using the web application.</p>
+        
+        <h5>2. Personal Use License</h5>
+        <p>Expense Pulse is provided by FerryPot Studios as a free tool for personal expense management. You may use and copy the associated Google Apps Script for your personal use.</p>
+
+        <h5>3. Disclaimer of Warranty</h5>
+        <p>Expense Pulse is provided "as is" without warranty of any kind. Users are responsible for maintaining and backing up their personal Google Sheets.</p>
+
+        <div class="modal-footer-brand">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONTHLY SUMMARY REPORT MODAL -->
+  <div class="modal-overlay" id="monthlySummaryModal">
+    <div class="modal-content modal-md">
+      <div class="modal-header">
+        <h3><i class="ri-calendar-event-fill"></i> Monthly Expense Summary</h3>
+        <button class="close-btn" id="closeMonthlySummaryBtn">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 20px;">
+        <div class="neo-box neo-box-yellow" style="padding: 20px; margin-bottom: 16px;">
+          <h4 id="summaryMonthTitle" style="font-family: var(--font-heading); font-weight:800; font-size:1.3rem; margin-bottom:8px;">August 2026 Summary 📊</h4>
+          <div style="font-size: 2.4rem; font-family: var(--font-heading); font-weight: 800; color: #000; margin: 10px 0;" id="summaryTotalAmount">₹0</div>
+          <p id="summaryTxDetails" style="font-weight:700; font-size:0.95rem; color: #333;">Total spent across 0 transactions</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <div class="neo-box" style="background-color: var(--pop-green); padding: 14px; text-align: left;">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Top Category</div>
+            <div id="summaryTopCategory" style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; margin-top: 4px;">--</div>
+          </div>
+          <div class="neo-box" style="background-color: var(--pop-cyan); padding: 14px; text-align: left;">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">Daily Avg</div>
+            <div id="summaryDailyAvg" style="font-family: var(--font-heading); font-size: 1.1rem; font-weight: 800; margin-top: 4px;">₹0</div>
+          </div>
+        </div>
+
+        <!-- NOTIFICATION PREFERENCES TOGGLES -->
+        <div class="neo-box" style="padding: 16px; margin-bottom: 16px; text-align: left; background-color: #FFFFFF;">
+          <div style="font-family: var(--font-heading); font-weight: 800; font-size: 0.85rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #000000; display: flex; align-items: center; gap: 6px;">
+            <i class="ri-notification-3-line"></i> Notification Preferences
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 2px solid #E5E5E5;">
+            <div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: #000;">Daily Summary Notification</div>
+              <div style="font-size: 0.73rem; color: #555; font-weight: 600;">Daily total & top category spent</div>
+            </div>
+            <label class="neo-switch">
+              <input type="checkbox" id="toggleDailyNotify" checked>
+              <span class="neo-slider"></span>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0 2px 0;">
+            <div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: #000;">Monthly Summary Notification</div>
+              <div style="font-size: 0.73rem; color: #555; font-weight: 600;">Monthly total & category breakdown</div>
+            </div>
+            <label class="neo-switch">
+              <input type="checkbox" id="toggleMonthlyNotify" checked>
+              <span class="neo-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer-brand" style="margin-top: 16px;">
+          Expense Pulse • Developed with ❤️ by <strong>FerryPot Studios</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNDO TOAST SNACKBAR -->
+  <div class="toast-snackbar" id="toastSnackbar">
+    <span id="toastMessage">Card deleted</span>
+    <button class="toast-undo-btn" id="toastUndoBtn">UNDO</button>
+  </div>
+
+  <!-- LIQUID GLASS REFRACTION SCRIPT -->
+  <script src="liquid-glass.js"></script>
+
+  <!-- CORE APP LOGIC -->
+  <script src="app.js"></script>
+</body>
+</html>

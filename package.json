@@ -1,0 +1,67 @@
+{
+  "name": "expense-pulse-desktop",
+  "version": "1.0.0",
+  "description": "Expense Pulse — Native Windows Desktop App for Google Sheets Tracking",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win"
+  },
+  "keywords": [
+    "expense-tracker",
+    "google-sheets",
+    "electron",
+    "windows-app"
+  ],
+  "author": "FerryPot Studios",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  },
+  "build": {
+    "appId": "com.ferrypotstudios.expensepulse",
+    "productName": "Expense Pulse",
+    "copyright": "Copyright © 2026 FerryPot Studios",
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://expense-pulse-for-iphone.web.app/updates/"
+      }
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "icon": "icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Expense Pulse"
+    }
+  }
+}
